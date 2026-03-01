@@ -10,15 +10,28 @@ Before running the service, ensure you have the following installed:
 - **Docker**: For containerized execution.
 - **Database**: PostgreSQL (or the DB configured in your `.env`).
 
+### Running with Bash Script (Recommended)
+This is the easiest way to run the service as it automates database creation and dependency management.
+1. Make sure you have PostgreSQL running and your `.env` file is configured.
+2. Run the script:
+   ```bash
+   ./run.sh
+   ```
+
 ### Running Manually
 1.  Ensure you have [Go](https://golang.org/doc/install) installed (version 1.21+ recommended).
-2.  Clone the repository and navigate to the project root.
-3.  Install dependencies:
+2.  Ensure you have [PostgreSQL](https://www.postgresql.org/download/) installed and running.
+3.  **Create the database** if it doesn't already exist:
+    ```bash
+    psql -h localhost -U postgres -c "CREATE DATABASE billenginedb"
+    ```
+4.  Clone the repository and navigate to the project root.
+5.  Install dependencies:
     ```bash
     go mod tidy
     ```
-4.  Setup your environment variables in a `.env` file (copied from `.env.example`).
-5.  Run the application:
+6.  Setup your environment variables in a `.env` file.
+7.  Run the application:
     ```bash
     go run main.go
     ```
