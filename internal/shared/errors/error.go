@@ -40,6 +40,10 @@ func Unwrap(target error) Error {
 }
 
 var (
-	ErrGeneral    = NewError(http.StatusInternalServerError, "01", "General Error")
-	ErrBadRequest = NewError(http.StatusBadRequest, "02", "Invalid request payload")
+	ErrGeneral                  = NewError(http.StatusInternalServerError, "01", "General Error")
+	ErrBadRequest               = NewError(http.StatusBadRequest, "02", "Invalid request payload")
+	ErrNotFound                 = NewError(http.StatusNotFound, "03", "Data not found")
+	ErrLoanClosed               = NewError(http.StatusNotAcceptable, "04", "Loan is already closed")
+	ErrNoOutstandingInstallment = NewError(http.StatusNotAcceptable, "05", "No Outstanding Installment")
+	ErrInvalidAmount            = NewError(http.StatusBadRequest, "06", "Invalid Amount")
 )

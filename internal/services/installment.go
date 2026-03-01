@@ -70,13 +70,13 @@ func (s *loanService) GetOutstanding(req dto.GetOutstandingRequest) (dto.GetOuts
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.GetOutstanding] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.GetOutstandingResponse{}, err
+		return dto.GetOutstandingResponse{}, errors.ErrNotFound
 	}
 
 	outstandingAmount, err := s.installmentRepo.GetOutstandingAmount(loan.ID)
 	if err != nil {
 		logger.Errorf("[service.GetOutstanding] Error fetching outstanding amount for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.GetOutstandingResponse{}, err
+		return dto.GetOutstandingResponse{}, errors.ErrGeneral
 	}
 
 	resp := dto.GetOutstandingResponse{
@@ -91,13 +91,13 @@ func (s *loanService) CheckDelinquent(req dto.CheckDelinquentRequest) (dto.Check
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.CheckDelinquent] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.CheckDelinquentResponse{}, err
+		return dto.CheckDelinquentResponse{}, errors.ErrNotFound
 	}
 
 	installments, err := s.installmentRepo.GetOverdueInstallment(loan.ID)
 	if err != nil {
 		logger.Errorf("[service.CheckDelinquent] Error fetching overdue installment for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.CheckDelinquentResponse{}, err
+		return dto.CheckDelinquentResponse{}, errors.ErrGeneral
 	}
 
 	resp := dto.CheckDelinquentResponse{

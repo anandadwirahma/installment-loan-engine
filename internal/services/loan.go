@@ -7,6 +7,7 @@ import (
 	"installment-loan-engine/internal/dto"
 	"installment-loan-engine/internal/entity"
 	"installment-loan-engine/internal/shared/constant"
+	"installment-loan-engine/internal/shared/errors"
 	"installment-loan-engine/internal/shared/logger"
 )
 
@@ -36,19 +37,19 @@ func (s *loanService) CreateLoan(req dto.CreateLoanRequest) (dto.CreateLoanRespo
 	if err := s.loanRepo.CreateWithTx(tx, loanEntity); err != nil {
 		s.loanRepo.RollbackTx(tx)
 		logger.Errorf("[service.CreateLoan] Error creating loan: %v", err)
-		return dto.CreateLoanResponse{}, err
+		return dto.CreateLoanResponse{}, errors.ErrGeneral
 	}
 
 	installmentEntities := s.generateInstallments(loanEntity)
 	if err := s.installmentRepo.CreateWithTx(tx, installmentEntities); err != nil {
 		s.loanRepo.RollbackTx(tx)
 		logger.Errorf("[service.CreateLoan] Error creating installments: %v", err)
-		return dto.CreateLoanResponse{}, err
+		return dto.CreateLoanResponse{}, errors.ErrGeneral
 	}
 
 	if err := s.loanRepo.CommitTx(tx); err != nil {
 		logger.Errorf("[service.CreateLoan] Error committing transaction: %v", err)
-		return dto.CreateLoanResponse{}, err
+		return dto.CreateLoanResponse{}, errors.ErrGeneral
 	}
 
 	return dto.CreateLoanResponse{

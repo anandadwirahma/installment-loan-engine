@@ -1,12 +1,12 @@
 package services
 
 import (
-	"fmt"
 	"time"
 
 	"installment-loan-engine/internal/dto"
 	"installment-loan-engine/internal/entity"
 	"installment-loan-engine/internal/shared/constant"
+	"installment-loan-engine/internal/shared/errors"
 	"installment-loan-engine/internal/shared/logger"
 )
 
@@ -14,23 +14,23 @@ func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInst
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.PayInstallment] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.PayInstallmentResponse{}, err
+		return dto.PayInstallmentResponse{}, errors.ErrNotFound
 	}
 
 	if loan.Status == constant.LoanStatusClosed {
 		logger.Errorf("[service.PayInstallment] Loan is closed for RefNum %s", req.LoanRefNum)
-		return dto.PayInstallmentResponse{}, fmt.Errorf("Loan is closed")
+		return dto.PayInstallmentResponse{}, errors.ErrLoanClosed
 	}
 
 	installments, err := s.installmentRepo.GetOutstandingInstallments(loan.ID)
 	if err != nil {
 		logger.Errorf("[service.PayInstallment] Error fetching outstanding installments for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.PayInstallmentResponse{}, err
+		return dto.PayInstallmentResponse{}, errors.ErrGeneral
 	}
 
 	if len(installments) == 0 {
 		logger.Errorf("[service.PayInstallment] No outstanding installment for RefNum %s", req.LoanRefNum)
-		return dto.PayInstallmentResponse{}, fmt.Errorf("No outstanding installment")
+		return dto.PayInstallmentResponse{}, errors.ErrNoOutstandingInstallment
 	}
 
 	var (
@@ -41,7 +41,7 @@ func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInst
 		transactions []*entity.Transaction
 	)
 
-	trxRefNum := "aiueo"
+	trxRefNum := "aiueo" //TODO: create function generator
 	for _, i := range installments {
 		totalAmountExpected += i.TotalAmount
 		paidInstallmentNumbers = append(paidInstallmentNumbers, i.InstallmentNumber)
@@ -58,19 +58,19 @@ func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInst
 
 	if totalAmountExpected != req.Amount {
 		logger.Errorf("[service.PayInstallment] Amount %d is not enough or exceeds outstanding balance for RefNum %s", req.Amount, req.LoanRefNum)
-		return dto.PayInstallmentResponse{}, fmt.Errorf("Amount %d is not enough or exceeds outstanding balance", req.Amount)
+		return dto.PayInstallmentResponse{}, errors.ErrInvalidAmount
 	}
 
 	if err = s.transactionRepo.Create(transactions); err != nil {
 		logger.Errorf("[service.PayInstallment] Error creating transaction for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.PayInstallmentResponse{}, fmt.Errorf("Failed init db trx")
+		return dto.PayInstallmentResponse{}, errors.ErrGeneral
 	}
 
 	if err = s.doPayProcess(installments, loan, now); err != nil {
 		logger.Errorf("[service.PayInstallment] Error processing payment for RefNum %s: %v", req.LoanRefNum, err)
 
 		s.transactionRepo.UpdateStatusByRefNum(trxRefNum, constant.TransactionStatusFailed)
-		return dto.PayInstallmentResponse{}, fmt.Errorf("Payment process error")
+		return dto.PayInstallmentResponse{}, errors.ErrGeneral
 	}
 
 	s.transactionRepo.UpdateStatusByRefNum(trxRefNum, constant.TransactionStatusSuccess)
