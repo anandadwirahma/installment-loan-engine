@@ -14,7 +14,6 @@ type InstallmentRepository interface {
 	CommitTx(tx *gorm.DB) error
 	RollbackTx(tx *gorm.DB) error
 	CreateWithTx(tx *gorm.DB, entity []*entity.Installment) error
-	GetOutstandingAmount(loanId int64) (int64, error)
 	GetOutstandingInstallments(loanId int64) ([]entity.Installment, error)
 	GetOverdueInstallment(loanId int64) ([]entity.Installment, error)
 	UpdateStatusWithTx(tx *gorm.DB, id int64, status constant.InstallmentStatus, paidAt time.Time) error
@@ -42,20 +41,6 @@ func (r *installmentRepository) RollbackTx(tx *gorm.DB) error {
 
 func (r *installmentRepository) CreateWithTx(tx *gorm.DB, entity []*entity.Installment) error {
 	return tx.Create(entity).Error
-}
-
-func (r *installmentRepository) GetOutstandingAmount(loanId int64) (int64, error) {
-	var outstanding int64
-
-	if err := r.gorm.Model(&entity.Installment{}).
-		Where("loan_id = ?", loanId).
-		Where("status = ?", constant.InstallmentStatusPending).
-		Select("SUM(total_amount)").
-		Scan(&outstanding).Error; err != nil {
-		return 0, err
-	}
-
-	return outstanding, nil
 }
 
 func (r *installmentRepository) GetOutstandingInstallments(loanId int64) ([]entity.Installment, error) {

@@ -7,6 +7,7 @@ import (
 	"installment-loan-engine/internal/entity"
 	"installment-loan-engine/internal/shared/constant"
 	"installment-loan-engine/internal/shared/errors"
+	"installment-loan-engine/internal/shared/helper"
 	"installment-loan-engine/internal/shared/logger"
 )
 
@@ -41,7 +42,7 @@ func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInst
 		transactions []*entity.Transaction
 	)
 
-	trxRefNum := "aiueo" //TODO: create function generator
+	trxRefNum := helper.GenerateUniqueNumber("TXN")
 	for _, i := range installments {
 		totalAmountExpected += i.TotalAmount
 		paidInstallmentNumbers = append(paidInstallmentNumbers, i.InstallmentNumber)
@@ -103,12 +104,17 @@ func (s *loanService) doPayProcess(installments []entity.Installment, loan entit
 		}
 	}
 
-	if (loan.TotalRepaymentAmount - paidTotalAmount) == 0 {
-		if err := s.loanRepo.UpdateStatusWithTx(tx, loan.ID, constant.LoanStatusClosed); err != nil {
-			s.installmentRepo.RollbackTx(tx)
-			logger.Errorf("[service.doPayProcess] Error updating loan status for RefNum %s: %v", loan.LoanRefNum, err)
-			return err
-		}
+	updatesLoan := make(map[string]interface{})
+	outstandingAmount := loan.OutstandingAmount - paidTotalAmount
+	if outstandingAmount == 0 {
+		updatesLoan["status"] = constant.LoanStatusClosed
+	}
+	updatesLoan["outstanding_amount"] = outstandingAmount
+
+	if err := s.loanRepo.UpdatesWithTx(tx, loan.ID, updatesLoan); err != nil {
+		s.installmentRepo.RollbackTx(tx)
+		logger.Errorf("[service.doPayProcess] Error updating loan status for RefNum %s: %v", loan.LoanRefNum, err)
+		return err
 	}
 
 	if err := s.installmentRepo.CommitTx(tx); err != nil {

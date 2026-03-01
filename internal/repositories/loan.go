@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"installment-loan-engine/internal/entity"
-	"installment-loan-engine/internal/shared/constant"
 
 	"gorm.io/gorm"
 )
@@ -14,7 +13,7 @@ type LoanRepository interface {
 	CreateWithTx(tx *gorm.DB, entity *entity.Loan) error
 	GetLoanInstallmentByRefNum(refNum string) (entity.Loan, error)
 	GetByRefNum(refNum string) (entity.Loan, error)
-	UpdateStatusWithTx(tx *gorm.DB, id int64, status constant.LoanStatus) error
+	UpdatesWithTx(tx *gorm.DB, id int64, updates map[string]interface{}) error
 }
 
 type loanRepository struct {
@@ -66,6 +65,9 @@ func (r *loanRepository) GetByRefNum(refNum string) (entity.Loan, error) {
 	return loan, nil
 }
 
-func (r *loanRepository) UpdateStatusWithTx(tx *gorm.DB, id int64, status constant.LoanStatus) error {
-	return tx.Model(&entity.Loan{}).Where("id = ?", id).Update("status", string(status)).Error
+func (r *loanRepository) UpdatesWithTx(tx *gorm.DB, id int64, updates map[string]interface{}) error {
+	return tx.Model(&entity.Loan{}).
+		Where("id = ?", id).
+		Updates(updates).
+		Error
 }

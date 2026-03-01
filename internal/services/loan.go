@@ -1,13 +1,13 @@
 package services
 
 import (
-	"fmt"
 	"time"
 
 	"installment-loan-engine/internal/dto"
 	"installment-loan-engine/internal/entity"
 	"installment-loan-engine/internal/shared/constant"
 	"installment-loan-engine/internal/shared/errors"
+	"installment-loan-engine/internal/shared/helper"
 	"installment-loan-engine/internal/shared/logger"
 )
 
@@ -16,7 +16,7 @@ func (s *loanService) CreateLoan(req dto.CreateLoanRequest) (dto.CreateLoanRespo
 	totalRepayment := req.PrincipalAmount + totalInterest
 
 	loanEntity := &entity.Loan{
-		LoanRefNum:           fmt.Sprintf("LOAN-%s-%d", req.BorrowerRefNum, time.Now().Unix()), //TODO: koreksi lagi
+		LoanRefNum:           helper.GenerateUniqueNumber("LN"),
 		BorrowerRefNum:       req.BorrowerRefNum,
 		PrincipalAmount:      req.PrincipalAmount,
 		InterestRate:         s.cfg.InterestRate,
@@ -25,6 +25,7 @@ func (s *loanService) CreateLoan(req dto.CreateLoanRequest) (dto.CreateLoanRespo
 		Status:               constant.LoanStatusActive,
 		TotalInterestAmount:  totalInterest,
 		TotalRepaymentAmount: totalRepayment,
+		OutstandingAmount:    totalRepayment,
 	}
 
 	tx := s.loanRepo.BeginTx()

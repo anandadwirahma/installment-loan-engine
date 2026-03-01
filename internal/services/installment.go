@@ -17,9 +17,8 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 	}
 
 	var (
-		totalOutstanding int64
-		totalOverdue     int
-		installments     = []dto.Installment{}
+		totalOverdue int
+		installments = []dto.Installment{}
 
 		now = time.Now()
 	)
@@ -34,8 +33,6 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 
 		status := v.Status
 		if v.Status == constant.InstallmentStatusPending {
-			totalOutstanding += v.TotalAmount
-
 			if v.DueDate.Before(now) {
 				status = constant.InstallmentStatusOverdue
 				totalOverdue++
@@ -58,7 +55,7 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 		TotalInstallments: int64(len(installments)),
 		Installments:      installments,
 		Summary: dto.Summary{
-			TotalOutstanding: totalOutstanding,
+			TotalOutstanding: loan.OutstandingAmount,
 			IsDelinquent:     totalOverdue >= 2,
 		},
 	}
@@ -73,15 +70,9 @@ func (s *loanService) GetOutstanding(req dto.GetOutstandingRequest) (dto.GetOuts
 		return dto.GetOutstandingResponse{}, errors.ErrNotFound
 	}
 
-	outstandingAmount, err := s.installmentRepo.GetOutstandingAmount(loan.ID)
-	if err != nil {
-		logger.Errorf("[service.GetOutstanding] Error fetching outstanding amount for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.GetOutstandingResponse{}, errors.ErrGeneral
-	}
-
 	resp := dto.GetOutstandingResponse{
 		LoanRefNum:        loan.LoanRefNum,
-		OutstandingAmount: outstandingAmount,
+		OutstandingAmount: loan.OutstandingAmount,
 	}
 
 	return resp, nil
