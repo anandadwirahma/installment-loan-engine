@@ -41,16 +41,25 @@ Before running the service, ensure you have the following installed:
 ### 1. Requirement
 
 #### a. Functional Requirement
-- **Loan Schedule Generation**: Automatically generates a weekly installment schedule upon loan creation.
-- **Outstanding Calculation**: Real-time calculation of remaining loan balance and due amounts.
-- **Delinquent Detection**: Detects borrowers with 2 or more consecutive missed payments.
-- **Create Payment**: Process installment payments and update loan status.
-- **Catch up payment for missed weeks**: Allows borrowers to pay missed installments to resume normal schedule.
+- **Loan Schedule Generation**:
+    - generates a weekly installment schedule upon loan creation.
+- **Outstanding Calculation**:
+    - calculates ofoutstanding on a loan and due date.
+- **Delinquent Detection**:
+    - detects borrowers with more than 2 weeks of Non payment of the loan amount.
+- **Create Payment**:
+    - process installment payments and update loan status.
+    - borrower can only pay the
+exact amount of payable that week or not pay at all
+- **Catch up payment for missed weeks**:
+    - allows borrowers to pay missed payment.
 
 #### b. Non-Functional Requirement
-- **Maintainability**: Built using Clean Architecture for clear separation of concerns.
-- **Reliability**: Uses database transactions to ensure data consistency between loans and installments.
-- **Observability**: Implements structured logging for tracking service operations.
+- **Maintainability**:
+    - Built using Clean Architecture for clear separation of concerns.
+- **Reliability**
+- **Observability**
+    - Implements structured logging for tracking service operations.
 
 ### 2. Architecture
 The service follows **Clean Architecture** patterns:
@@ -74,11 +83,12 @@ The service follows **Clean Architecture** patterns:
 ```
 
 #### High Level Flow
-[Reserve place for Flow Diagram]
+![High Level Flow](assets/high-level-flow.png)
 
 #### High Level Architecture
-[Reserve place for Architecture Diagram]
-URL: [Insert URL Here]
+![High Level Architecture](assets/high-level-architecture.png)
+
+URL: [\[High Level Flow & Architecture\]](https://whimsical.com/flow-SjJbuFRC3k4W65SLDZVHJ2)
 
 ### 3. Database Design
 The system uses a relational database with the following core entities:
@@ -86,8 +96,8 @@ The system uses a relational database with the following core entities:
 - **Installments**: Stores individual weekly payment schedules.
 - **Transactions**: Tracks payment history.
 
-[Reserve place for ERD Image]
-URL: [Insert URL Here]
+![DB Design](assets/db-design.png)
+URL: [\[Database Design\]](https://whimsical.com/database-DZ5Qiz8pmnRFUonXK5wMTC)
 
 ### 4. API Design
 
