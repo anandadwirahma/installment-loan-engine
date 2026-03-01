@@ -1,10 +1,11 @@
 package repositories
 
 import (
+	"gorm.io/gorm"
+
 	"installment-loan-engine/internal/entity"
 	"installment-loan-engine/internal/shared/constant"
-
-	"gorm.io/gorm"
+	"installment-loan-engine/internal/shared/logger"
 )
 
 type TransactionRepository interface {
@@ -25,7 +26,13 @@ func (r *transactionRepository) Create(entity []*entity.Transaction) error {
 }
 
 func (r *transactionRepository) UpdateStatusByRefNum(trxRefNum string, status constant.TransactionStatus) error {
-	return r.gorm.Model(&entity.Transaction{}).
+	err := r.gorm.Model(&entity.Transaction{}).
 		Where("trx_ref_num = ?", trxRefNum).
 		Update("status", status).Error
+	if err != nil {
+		logger.Errorf("[transactionRepository.UpdateStatusByRefNum] Error updating transaction status for RefNum %s: %v", trxRefNum, err)
+		return err
+	}
+
+	return nil
 }

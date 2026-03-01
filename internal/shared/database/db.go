@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -10,11 +9,12 @@ import (
 
 	"installment-loan-engine/internal/entity"
 	"installment-loan-engine/internal/shared/config"
+	"installment-loan-engine/internal/shared/logger"
 )
 
 var DB *gorm.DB
 
-func InitDB() {
+func Init() {
 	var err error
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta",
@@ -52,6 +52,5 @@ func InitDB() {
 		panic(fmt.Sprintf("AutoMigrate failed: %v", err))
 	}
 
-	log.Println("Database migration completed")
-	log.Printf("Database connection established (Idle: %d, Open: %d, Lifetime: %dm)\n", maxIdle, maxOpen, maxLifetime)
+	logger.Infof("Database connection established (Idle: %d, Open: %d, Lifetime: %dm)\n", maxIdle, maxOpen, maxLifetime)
 }

@@ -5,11 +5,13 @@ import (
 
 	"installment-loan-engine/internal/dto"
 	"installment-loan-engine/internal/shared/constant"
+	"installment-loan-engine/internal/shared/logger"
 )
 
 func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInstallmentResponse, error) {
 	loan, err := s.loanRepo.GetLoanInstallmentByRefNum(req.LoanRefNum)
 	if err != nil {
+		logger.Errorf("[service.GetInstallment] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
 		return dto.GetInstallmentResponse{}, err
 	}
 
@@ -66,11 +68,13 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 func (s *loanService) GetOutstanding(req dto.GetOutstandingRequest) (dto.GetOutstandingResponse, error) {
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
+		logger.Errorf("[service.GetOutstanding] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
 		return dto.GetOutstandingResponse{}, err
 	}
 
 	outstandingAmount, err := s.installmentRepo.GetOutstandingAmount(loan.ID)
 	if err != nil {
+		logger.Errorf("[service.GetOutstanding] Error fetching outstanding amount for RefNum %s: %v", req.LoanRefNum, err)
 		return dto.GetOutstandingResponse{}, err
 	}
 
@@ -85,11 +89,13 @@ func (s *loanService) GetOutstanding(req dto.GetOutstandingRequest) (dto.GetOuts
 func (s *loanService) CheckDelinquent(req dto.CheckDelinquentRequest) (dto.CheckDelinquentResponse, error) {
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
+		logger.Errorf("[service.CheckDelinquent] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
 		return dto.CheckDelinquentResponse{}, err
 	}
 
 	installments, err := s.installmentRepo.GetOverdueInstallment(loan.ID)
 	if err != nil {
+		logger.Errorf("[service.CheckDelinquent] Error fetching overdue installment for RefNum %s: %v", req.LoanRefNum, err)
 		return dto.CheckDelinquentResponse{}, err
 	}
 

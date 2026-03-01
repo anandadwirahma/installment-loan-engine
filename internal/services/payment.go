@@ -7,24 +7,29 @@ import (
 	"installment-loan-engine/internal/dto"
 	"installment-loan-engine/internal/entity"
 	"installment-loan-engine/internal/shared/constant"
+	"installment-loan-engine/internal/shared/logger"
 )
 
 func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInstallmentResponse, error) {
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
+		logger.Errorf("[service.PayInstallment] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
 		return dto.PayInstallmentResponse{}, err
 	}
 
 	if loan.Status == constant.LoanStatusClosed {
+		logger.Errorf("[service.PayInstallment] Loan is closed for RefNum %s", req.LoanRefNum)
 		return dto.PayInstallmentResponse{}, fmt.Errorf("Loan is closed")
 	}
 
 	installments, err := s.installmentRepo.GetOutstandingInstallments(loan.ID)
 	if err != nil {
+		logger.Errorf("[service.PayInstallment] Error fetching outstanding installments for RefNum %s: %v", req.LoanRefNum, err)
 		return dto.PayInstallmentResponse{}, err
 	}
 
 	if len(installments) == 0 {
+		logger.Errorf("[service.PayInstallment] No outstanding installment for RefNum %s", req.LoanRefNum)
 		return dto.PayInstallmentResponse{}, fmt.Errorf("No outstanding installment")
 	}
 
@@ -52,14 +57,18 @@ func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInst
 	}
 
 	if totalAmountExpected != req.Amount {
+		logger.Errorf("[service.PayInstallment] Amount %d is not enough or exceeds outstanding balance for RefNum %s", req.Amount, req.LoanRefNum)
 		return dto.PayInstallmentResponse{}, fmt.Errorf("Amount %d is not enough or exceeds outstanding balance", req.Amount)
 	}
 
 	if err = s.transactionRepo.Create(transactions); err != nil {
+		logger.Errorf("[service.PayInstallment] Error creating transaction for RefNum %s: %v", req.LoanRefNum, err)
 		return dto.PayInstallmentResponse{}, fmt.Errorf("Failed init db trx")
 	}
 
 	if err = s.doPayProcess(installments, loan, now); err != nil {
+		logger.Errorf("[service.PayInstallment] Error processing payment for RefNum %s: %v", req.LoanRefNum, err)
+
 		s.transactionRepo.UpdateStatusByRefNum(trxRefNum, constant.TransactionStatusFailed)
 		return dto.PayInstallmentResponse{}, fmt.Errorf("Payment process error")
 	}
@@ -89,6 +98,7 @@ func (s *loanService) doPayProcess(installments []entity.Installment, loan entit
 		paidTotalAmount += i.TotalAmount
 		if err := s.installmentRepo.UpdateStatusWithTx(tx, i.ID, constant.InstallmentStatusPaid, paidAt); err != nil {
 			s.installmentRepo.RollbackTx(tx)
+			logger.Errorf("[service.doPayProcess] Error updating installment status for RefNum %s: %v", loan.LoanRefNum, err)
 			return err
 		}
 	}
@@ -96,11 +106,13 @@ func (s *loanService) doPayProcess(installments []entity.Installment, loan entit
 	if (loan.TotalRepaymentAmount - paidTotalAmount) == 0 {
 		if err := s.loanRepo.UpdateStatusWithTx(tx, loan.ID, constant.LoanStatusClosed); err != nil {
 			s.installmentRepo.RollbackTx(tx)
+			logger.Errorf("[service.doPayProcess] Error updating loan status for RefNum %s: %v", loan.LoanRefNum, err)
 			return err
 		}
 	}
 
 	if err := s.installmentRepo.CommitTx(tx); err != nil {
+		logger.Errorf("[service.doPayProcess] Error committing transaction for RefNum %s: %v", loan.LoanRefNum, err)
 		return err
 	}
 

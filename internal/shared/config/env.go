@@ -6,11 +6,13 @@ import (
 
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
+
+	"installment-loan-engine/internal/shared/logger"
 )
 
 var AppConfig Config
 
-func InitConfig() {
+func Init() {
 	err := godotenv.Load()
 	if err != nil {
 		panic(fmt.Errorf("Error loading .env file: %v", err))
@@ -20,6 +22,8 @@ func InitConfig() {
 	if err != nil {
 		panic(fmt.Errorf("Error parsing env: %v", err))
 	}
+
+	logger.Infof("Config loaded: %+v\n", AppConfig)
 }
 
 func GetEnv(key, defaultVal string) string {

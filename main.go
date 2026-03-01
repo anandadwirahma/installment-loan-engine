@@ -10,14 +10,18 @@ import (
 	"installment-loan-engine/internal/services"
 	"installment-loan-engine/internal/shared/config"
 	"installment-loan-engine/internal/shared/database"
+	"installment-loan-engine/internal/shared/logger"
 )
 
 func main() {
+	// Initiate Logger
+	logger.Init()
+
 	// Initiate Config
-	config.InitConfig()
+	config.Init()
 
 	// Initiate Database
-	database.InitDB()
+	database.Init()
 
 	// Initiate Repository
 	loanRepo := repositories.NewLoanRepository(database.DB)
