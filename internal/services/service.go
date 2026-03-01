@@ -17,9 +17,20 @@ type LoanService interface {
 type loanService struct {
 	loanRepo        repositories.LoanRepository
 	installmentRepo repositories.InstallmentRepository
+	transactionRepo repositories.TransactionRepository
 	cfg             config.Config
 }
 
-func NewLoanService() LoanService {
-	return &loanService{}
+func NewLoanService(
+	loanRepo repositories.LoanRepository,
+	installmentRepo repositories.InstallmentRepository,
+	transactionRepo repositories.TransactionRepository,
+	cfg config.Config,
+) LoanService {
+	return &loanService{
+		loanRepo:        loanRepo,
+		installmentRepo: installmentRepo,
+		transactionRepo: transactionRepo,
+		cfg:             cfg,
+	}
 }
