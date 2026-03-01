@@ -13,12 +13,13 @@ type InstallmentStatus string
 const (
 	InstallmentStatusPending InstallmentStatus = "PENDING"
 	InstallmentStatusPaid    InstallmentStatus = "PAID"
+	InstallmentStatusOverdue                   = "OVERDUE" // it's used by logic calculation
 )
 
 type TransactionStatus string
 
 const (
-	TransactionStatusInit    TransactionStatus = "INIT"
+	TransactionStatusPending TransactionStatus = "PENDING"
 	TransactionStatusSuccess TransactionStatus = "SUCCESS"
 	TransactionStatusFailed  TransactionStatus = "FAILED"
 )

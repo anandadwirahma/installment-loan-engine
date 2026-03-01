@@ -46,7 +46,7 @@ func (h *LoanHandler) CreateLoan(c *gin.Context) {
 }
 
 func (h *LoanHandler) GetInstallment(c *gin.Context) {
-	var req dto.GetInstallmentRequest
+	req := dto.GetInstallmentRequest{LoanRefNum: c.Param("loan_ref_num")}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.APIResponse{
 			Code:    "BAD_REQUEST",

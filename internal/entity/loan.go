@@ -6,7 +6,7 @@ import (
 )
 
 type Loan struct {
-	ID                   int64               `gorm:"primaryKey;autoIncrement;type:bigserial"`
+	ID                   int64               `gorm:"primaryKey;autoIncrement"`
 	BorrowerRefNum       string              `gorm:"type:varchar(50);not null;index"`
 	LoanRefNum           string              `gorm:"type:varchar(50);not null;uniqueIndex"`
 	PrincipalAmount      int64               `gorm:"type:bigint;not null"`
@@ -16,9 +16,10 @@ type Loan struct {
 	TotalInterestAmount  int64               `gorm:"type:bigint;not null"`
 	TotalRepaymentAmount int64               `gorm:"type:bigint;not null"`
 	Status               constant.LoanStatus `gorm:"type:varchar(10);not null"`
-	Installments         []Installment
-	CreatedAt            time.Time `gorm:"type:timestamp;autoCreateTime"`
-	UpdatedAt            time.Time `gorm:"type:timestamp;autoUpdateTime"`
+	CreatedAt            time.Time           `gorm:"type:timestamp;autoCreateTime"`
+	UpdatedAt            time.Time           `gorm:"type:timestamp;autoUpdateTime"`
+
+	Installments []Installment `gorm:"foreignKey:LoanID;references:ID"`
 }
 
 func (Loan) TableName() string {

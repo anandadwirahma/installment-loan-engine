@@ -13,11 +13,13 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 		return dto.GetInstallmentResponse{}, err
 	}
 
-	installments := []dto.Installment{}
-	var totalOutstanding int64
-	var nextDueDate string
-	overdueCount := 0
-	now := time.Now()
+	var (
+		totalOutstanding int64
+		totalOverdue     int
+		installments     = []dto.Installment{}
+
+		now = time.Now()
+	)
 
 	for _, v := range loan.Installments {
 		var paidAt *string
@@ -27,15 +29,13 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 			paidAt = &paidAtStr
 		}
 
-		status := string(v.Status)
+		status := v.Status
 		if v.Status == constant.InstallmentStatusPending {
 			totalOutstanding += v.TotalAmount
-			if nextDueDate == "" {
-				nextDueDate = v.DueDate.Format(time.RFC3339)
-			}
+
 			if v.DueDate.Before(now) {
-				status = "OVERDUE"
-				overdueCount++
+				status = constant.InstallmentStatusOverdue
+				totalOverdue++
 			}
 		}
 
@@ -45,7 +45,7 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 			InterestAmount:    v.InterestAmount,
 			TotalAmount:       v.TotalAmount,
 			DueDate:           v.DueDate.Format(time.RFC3339),
-			Status:            status,
+			Status:            string(status),
 			PaidAt:            paidAt,
 		})
 	}
@@ -56,8 +56,7 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 		Installments:      installments,
 		Summary: dto.Summary{
 			TotalOutstanding: totalOutstanding,
-			NextDueDate:      nextDueDate,
-			Delinquent:       overdueCount >= 2,
+			IsDelinquent:     totalOverdue >= 2,
 		},
 	}
 

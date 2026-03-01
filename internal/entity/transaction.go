@@ -6,7 +6,7 @@ import (
 )
 
 type Transaction struct {
-	ID            int64                      `gorm:"primaryKey;type:bigserial"`
+	ID            int64                      `gorm:"primaryKey;autoIncrement"`
 	TrxRefNum     string                     `gorm:"type:varchar(50);not null;uniqueIndex"`
 	LoanID        int64                      `gorm:"type:bigint;not null;index"`
 	InstallmentID int64                      `gorm:"type:bigint;not null;index"`

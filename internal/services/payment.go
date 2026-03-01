@@ -31,32 +31,52 @@ func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInst
 	var (
 		totalAmountExpected    int64
 		paidInstallmentNumbers []int16
-		now                    time.Time
+		now                    = time.Now()
+
+		transactions []*entity.Transaction
 	)
 
+	trxRefNum := "aiueo"
 	for _, i := range installments {
 		totalAmountExpected += i.TotalAmount
 		paidInstallmentNumbers = append(paidInstallmentNumbers, i.InstallmentNumber)
+
+		// compose transaction data
+		transactions = append(transactions, &entity.Transaction{
+			TrxRefNum:     trxRefNum,
+			LoanID:        i.LoanID,
+			InstallmentID: i.ID,
+			Amount:        i.TotalAmount,
+			Status:        constant.TransactionStatusPending,
+		})
 	}
 
 	if totalAmountExpected != req.Amount {
 		return dto.PayInstallmentResponse{}, fmt.Errorf("Amount %d is not enough or exceeds outstanding balance", req.Amount)
 	}
 
-	if err = s.doPayProcess(installments, now); err != nil {
-		return dto.PayInstallmentResponse{}, fmt.Errorf("Error process payment")
+	if err = s.transactionRepo.Create(transactions); err != nil {
+		return dto.PayInstallmentResponse{}, fmt.Errorf("Failed init db trx")
 	}
 
+	if err = s.doPayProcess(installments, loan, now); err != nil {
+		s.transactionRepo.UpdateStatusByRefNum(trxRefNum, constant.TransactionStatusFailed)
+		return dto.PayInstallmentResponse{}, fmt.Errorf("Payment process error")
+	}
+
+	s.transactionRepo.UpdateStatusByRefNum(trxRefNum, constant.TransactionStatusSuccess)
+
 	return dto.PayInstallmentResponse{
+		TrxRefNum:            trxRefNum,
 		LoanRefNum:           loan.LoanRefNum,
 		PaidAmount:           req.Amount,
 		PaidInstallments:     paidInstallmentNumbers,
-		RemainingOutstanding: 0,
+		RemainingOutstanding: loan.TotalRepaymentAmount - req.Amount,
 		PaidAt:               now.Format(time.RFC3339),
 	}, nil
 }
 
-func (s *loanService) doPayProcess(installments []entity.Installment, paidAt time.Time) error {
+func (s *loanService) doPayProcess(installments []entity.Installment, loan entity.Loan, paidAt time.Time) error {
 	tx := s.installmentRepo.BeginTx()
 	defer func() {
 		if r := recover(); r != nil {
@@ -64,8 +84,17 @@ func (s *loanService) doPayProcess(installments []entity.Installment, paidAt tim
 		}
 	}()
 
+	var paidTotalAmount int64
 	for _, i := range installments {
+		paidTotalAmount += i.TotalAmount
 		if err := s.installmentRepo.UpdateStatusWithTx(tx, i.ID, constant.InstallmentStatusPaid, paidAt); err != nil {
+			s.installmentRepo.RollbackTx(tx)
+			return err
+		}
+	}
+
+	if (loan.TotalRepaymentAmount - paidTotalAmount) == 0 {
+		if err := s.loanRepo.UpdateStatusWithTx(tx, loan.ID, constant.LoanStatusClosed); err != nil {
 			s.installmentRepo.RollbackTx(tx)
 			return err
 		}
@@ -74,8 +103,6 @@ func (s *loanService) doPayProcess(installments []entity.Installment, paidAt tim
 	if err := s.installmentRepo.CommitTx(tx); err != nil {
 		return err
 	}
-
-	// TODO: Insert record to table transaction
 
 	return nil
 }

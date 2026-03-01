@@ -22,9 +22,8 @@ type Installment struct {
 }
 
 type Summary struct {
-	TotalOutstanding int64  `json:"total_outstanding"`
-	NextDueDate      string `json:"next_due_date"`
-	Delinquent       bool   `json:"delinquent"`
+	TotalOutstanding int64 `json:"total_outstanding"`
+	IsDelinquent     bool  `json:"is_delinquent"`
 }
 
 type GetOutstandingRequest struct {

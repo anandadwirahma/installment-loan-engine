@@ -45,9 +45,11 @@ func (r *loanRepository) GetLoanInstallmentByRefNum(refNum string) (entity.Loan,
 	var loan entity.Loan
 
 	if err := r.gorm.
-		Preload("Installments").
+		Preload("Installments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("installment_number asc")
+		}).
 		Where("loan_ref_num = ?", refNum).
-		Find(&loan).Error; err != nil {
+		First(&loan).Error; err != nil {
 		return entity.Loan{}, err
 	}
 

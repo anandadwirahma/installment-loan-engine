@@ -8,8 +8,8 @@ import (
 )
 
 type TransactionRepository interface {
-	Create(entity *entity.Transaction) error
-	UpdateStatus(id int64, status constant.TransactionStatus) error
+	Create(entity []*entity.Transaction) error
+	UpdateStatusByRefNum(trxRefNum string, status constant.TransactionStatus) error
 }
 
 type transactionRepository struct {
@@ -20,12 +20,12 @@ func NewTransactionRepository(gorm *gorm.DB) TransactionRepository {
 	return &transactionRepository{gorm: gorm}
 }
 
-func (r *transactionRepository) Create(entity *entity.Transaction) error {
+func (r *transactionRepository) Create(entity []*entity.Transaction) error {
 	return r.gorm.Create(entity).Error
 }
 
-func (r *transactionRepository) UpdateStatus(id int64, status constant.TransactionStatus) error {
+func (r *transactionRepository) UpdateStatusByRefNum(trxRefNum string, status constant.TransactionStatus) error {
 	return r.gorm.Model(&entity.Transaction{}).
-		Where("id = ?", id).
+		Where("trx_ref_num = ?", trxRefNum).
 		Update("status", status).Error
 }

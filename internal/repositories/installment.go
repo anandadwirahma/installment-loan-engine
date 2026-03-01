@@ -93,8 +93,11 @@ func (r *installmentRepository) GetOverdueInstallment(loanId int64) ([]entity.In
 }
 
 func (r *installmentRepository) UpdateStatusWithTx(tx *gorm.DB, id int64, status constant.InstallmentStatus, paidAt time.Time) error {
-	return tx.Model(&entity.Loan{}).
+	return tx.Model(&entity.Installment{}).
 		Where("id = ?", id).
-		Updates(&entity.Installment{Status: status, PaidAt: &paidAt}).
+		Updates(map[string]interface{}{
+			"status":  status,
+			"paid_at": paidAt,
+		}).
 		Error
 }
