@@ -7,6 +7,9 @@ import (
 
 	"installment-loan-engine/internal/dto"
 	"installment-loan-engine/internal/services"
+	"installment-loan-engine/internal/shared/constant"
+	"installment-loan-engine/internal/shared/errors"
+	"installment-loan-engine/internal/shared/helper"
 )
 
 type LoanHandler struct {
@@ -22,25 +25,23 @@ func NewLoanHandler(service services.LoanService) *LoanHandler {
 func (h *LoanHandler) CreateLoan(c *gin.Context) {
 	var req dto.CreateLoanRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.APIResponse{
-			Code:    "BAD_REQUEST",
-			Message: "Invalid request payload",
+		e := errors.ErrBadRequest
+		c.JSON(e.HttpCode, dto.APIResponse{
+			Code:    e.Code,
+			Message: e.Message,
 		})
 		return
 	}
 
 	loan, err := h.service.CreateLoan(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.APIResponse{
-			Code:    "INTERNAL_ERROR",
-			Message: "Failed to create loan",
-		})
+		helper.ErrorHandler(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, dto.APIResponse{
-		Code:    "SUCCESS",
-		Message: "Loan created successfully.",
+		Code:    constant.SuccessCode,
+		Message: constant.SuccessMessage,
 		Data:    loan,
 	})
 }
@@ -48,25 +49,23 @@ func (h *LoanHandler) CreateLoan(c *gin.Context) {
 func (h *LoanHandler) GetInstallment(c *gin.Context) {
 	req := dto.GetInstallmentRequest{LoanRefNum: c.Param("loan_ref_num")}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.APIResponse{
-			Code:    "BAD_REQUEST",
-			Message: "Invalid request payload",
+		e := errors.ErrBadRequest
+		c.JSON(e.HttpCode, dto.APIResponse{
+			Code:    e.Code,
+			Message: e.Message,
 		})
 		return
 	}
 
 	installment, err := h.service.GetInstallment(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.APIResponse{
-			Code:    "INTERNAL_ERROR",
-			Message: "Failed to get installment",
-		})
+		helper.ErrorHandler(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, dto.APIResponse{
-		Code:    "SUCCESS",
-		Message: "Installment retrieved successfully.",
+		Code:    constant.SuccessCode,
+		Message: constant.SuccessMessage,
 		Data:    installment,
 	})
 }
@@ -74,25 +73,23 @@ func (h *LoanHandler) GetInstallment(c *gin.Context) {
 func (h *LoanHandler) GetOutstanding(c *gin.Context) {
 	req := dto.GetOutstandingRequest{LoanRefNum: c.Param("loan_ref_num")}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.APIResponse{
-			Code:    "BAD_REQUEST",
-			Message: "Invalid request payload",
+		e := errors.ErrBadRequest
+		c.JSON(e.HttpCode, dto.APIResponse{
+			Code:    e.Code,
+			Message: e.Message,
 		})
 		return
 	}
 
 	outstanding, err := h.service.GetOutstanding(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.APIResponse{
-			Code:    "INTERNAL_ERROR",
-			Message: "Failed to get outstanding",
-		})
+		helper.ErrorHandler(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, dto.APIResponse{
-		Code:    "SUCCESS",
-		Message: "Outstanding retrieved successfully.",
+		Code:    constant.SuccessCode,
+		Message: constant.SuccessMessage,
 		Data:    outstanding,
 	})
 }
@@ -100,25 +97,23 @@ func (h *LoanHandler) GetOutstanding(c *gin.Context) {
 func (h *LoanHandler) CheckDelinquent(c *gin.Context) {
 	req := dto.CheckDelinquentRequest{LoanRefNum: c.Param("loan_ref_num")}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.APIResponse{
-			Code:    "BAD_REQUEST",
-			Message: "Invalid request payload",
+		e := errors.ErrBadRequest
+		c.JSON(e.HttpCode, dto.APIResponse{
+			Code:    e.Code,
+			Message: e.Message,
 		})
 		return
 	}
 
 	delinquent, err := h.service.CheckDelinquent(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.APIResponse{
-			Code:    "INTERNAL_ERROR",
-			Message: "Failed to check delinquent",
-		})
+		helper.ErrorHandler(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, dto.APIResponse{
-		Code:    "SUCCESS",
-		Message: "Delinquent checked successfully.",
+		Code:    constant.SuccessCode,
+		Message: constant.SuccessMessage,
 		Data:    delinquent,
 	})
 }
@@ -126,25 +121,23 @@ func (h *LoanHandler) CheckDelinquent(c *gin.Context) {
 func (h *LoanHandler) PayInstallment(c *gin.Context) {
 	var req dto.PayInstallmentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.APIResponse{
-			Code:    "BAD_REQUEST",
-			Message: "Invalid request payload",
+		e := errors.ErrBadRequest
+		c.JSON(e.HttpCode, dto.APIResponse{
+			Code:    e.Code,
+			Message: e.Message,
 		})
 		return
 	}
 
 	payment, err := h.service.PayInstallment(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.APIResponse{
-			Code:    "INTERNAL_ERROR",
-			Message: "Failed to pay installment",
-		})
+		helper.ErrorHandler(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, dto.APIResponse{
-		Code:    "SUCCESS",
-		Message: "Installment paid successfully.",
+		Code:    constant.SuccessCode,
+		Message: constant.SuccessMessage,
 		Data:    payment,
 	})
 }

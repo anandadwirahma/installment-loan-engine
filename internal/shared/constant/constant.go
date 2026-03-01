@@ -23,3 +23,8 @@ const (
 	TransactionStatusSuccess TransactionStatus = "SUCCESS"
 	TransactionStatusFailed  TransactionStatus = "FAILED"
 )
+
+const (
+	SuccessCode    = "00"
+	SuccessMessage = "Success"
+)

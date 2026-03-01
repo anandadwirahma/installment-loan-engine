@@ -5,6 +5,7 @@ import (
 
 	"installment-loan-engine/internal/dto"
 	"installment-loan-engine/internal/shared/constant"
+	"installment-loan-engine/internal/shared/errors"
 	"installment-loan-engine/internal/shared/logger"
 )
 
@@ -12,7 +13,7 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 	loan, err := s.loanRepo.GetLoanInstallmentByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.GetInstallment] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.GetInstallmentResponse{}, err
+		return dto.GetInstallmentResponse{}, errors.ErrGeneral
 	}
 
 	var (
