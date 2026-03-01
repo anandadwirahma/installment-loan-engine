@@ -1,0 +1,47 @@
+services:
+  # PostgreSQL Service
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-db
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "${HOST_DB_PORT}:${CONT_DB_PORT}"
+    volumes:
+      - postgres-db-data:/var/lib/postgresql/data
+    networks:
+      - loan-engine-network
+
+  # API Installment Loan Engine Service
+  api-installment-loan-engine:
+    build: .
+    image: installment-loan-engine:1.0.0
+    container_name: api-installment-loan-engine
+    restart: on-failure
+    depends_on:
+      - postgres-db
+    env_file:
+      - .env
+    ports:
+      - "${HOST_API_PORT}:${CONT_API_PORT}"
+    environment:
+      - APP_PORT=${CONT_API_PORT}
+      - DB_HOST=postgres-db
+      - DB_PORT=${CONT_DB_PORT}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    networks:
+      - loan-engine-network
+
+volumes:
+  postgres-db-data:
+
+networks:
+  loan-engine-network:
+    driver: bridge

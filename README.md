@@ -36,17 +36,18 @@ This is the easiest way to run the service as it automates database creation and
     go run main.go
     ```
 
-### Running by Docker
-1.  Ensure you have [Docker](https://docs.docker.com/get-docker/) installed.
-2.  Build the Docker image:
+### Running with Docker Compose
+1. Ensure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+2. Setup your environment variables in the `.env` file (see [Docker Compose Variables](#docker-compose-variables) section if needed).
+3. Build and start the containers:
     ```bash
-    docker build -t billing-engine-service .
+    docker-compose up -d --build
     ```
-3.  Run the container:
+4. The service will be available at `http://localhost:8082`.
+5. To stop the containers:
     ```bash
-    docker run -p 8080:8080 --env-file .env billing-engine-service
+    docker-compose down
     ```
-
 ---
 
 ## System Design
