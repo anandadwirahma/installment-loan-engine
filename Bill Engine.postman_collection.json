@@ -1,0 +1,469 @@
+{
+  "info": {
+    "_postman_id": "a4c7e6d9-c848-4c73-ac65-da82a288290a",
+    "name": "Bill Engine",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "14187981"
+  },
+  "item": [
+    {
+      "name": "health check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Loan",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"borrower_ref_num\": \"B0001\",\n  \"principal_amount\": 3000000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8082/api/v1/loans",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "v1",
+            "loans"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create Loan",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrower_ref_num\": \"B0001\",\n  \"principal_amount\": 3000000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/v1/loans",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "v1",
+                "loans"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 03:27:15 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "219"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": \"00\",\n    \"message\": \"Success\",\n    \"data\": {\n        \"loan_ref_num\": \"LN-02032026-809407916\",\n        \"principal_amount\": 3000000,\n        \"total_interest_amount\": 300000,\n        \"total_repayment_amount\": 3300000,\n        \"weekly_installment\": 1100000,\n        \"status\": \"ACTIVE\"\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Installment Schedule",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/api/v1/loans/:loan_ref_num/installments",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "v1",
+            "loans",
+            ":loan_ref_num",
+            "installments"
+          ],
+          "variable": [
+            {
+              "key": "loan_ref_num",
+              "value": "LN-02032026-809407916"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Get Installment Schedule",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/v1/loans/:loan_ref_num/installments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "v1",
+                "loans",
+                ":loan_ref_num",
+                "installments"
+              ],
+              "variable": [
+                {
+                  "key": "loan_ref_num",
+                  "value": "LN-02032026-809407916"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 03:37:33 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "687"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": \"00\",\n    \"message\": \"Success\",\n    \"data\": {\n        \"loan_ref_num\": \"LN-02032026-809407916\",\n        \"total_installments\": 3,\n        \"installments\": [\n            {\n                \"installment_number\": 1,\n                \"principal_amount\": 1000000,\n                \"interest_amount\": 100000,\n                \"total_amount\": 1100000,\n                \"due_date\": \"2026-03-09T00:00:00Z\",\n                \"status\": \"PENDING\",\n                \"paid_at\": null\n            },\n            {\n                \"installment_number\": 2,\n                \"principal_amount\": 1000000,\n                \"interest_amount\": 100000,\n                \"total_amount\": 1100000,\n                \"due_date\": \"2026-03-16T00:00:00Z\",\n                \"status\": \"PENDING\",\n                \"paid_at\": null\n            },\n            {\n                \"installment_number\": 3,\n                \"principal_amount\": 1000000,\n                \"interest_amount\": 100000,\n                \"total_amount\": 1100000,\n                \"due_date\": \"2026-03-23T00:00:00Z\",\n                \"status\": \"PENDING\",\n                \"paid_at\": null\n            }\n        ],\n        \"summary\": {\n            \"total_outstanding\": 3300000,\n            \"is_delinquent\": false\n        }\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Outstanding",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/api/v1/loans/:loan_ref_num/outstanding",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "v1",
+            "loans",
+            ":loan_ref_num",
+            "outstanding"
+          ],
+          "variable": [
+            {
+              "key": "loan_ref_num",
+              "value": "LN-02032026-809407916"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Get Outstanding",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/v1/loans/:loan_ref_num/outstanding",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "v1",
+                "loans",
+                ":loan_ref_num",
+                "outstanding"
+              ],
+              "variable": [
+                {
+                  "key": "loan_ref_num",
+                  "value": "LN-02032026-809407916"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 03:38:06 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "110"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": \"00\",\n    \"message\": \"Success\",\n    \"data\": {\n        \"loan_ref_num\": \"LN-02032026-809407916\",\n        \"outstanding_amount\": 3300000\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Check Delinquent",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/api/v1/loans/:loan_ref_num/delinquent",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "v1",
+            "loans",
+            ":loan_ref_num",
+            "delinquent"
+          ],
+          "variable": [
+            {
+              "key": "loan_ref_num",
+              "value": "LN-01032026-868624193"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Check Delinquent",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/v1/loans/:loan_ref_num/delinquent",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "v1",
+                "loans",
+                ":loan_ref_num",
+                "delinquent"
+              ],
+              "variable": [
+                {
+                  "key": "loan_ref_num",
+                  "value": "LN-01032026-868624193"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 03:38:24 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "103"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": \"00\",\n    \"message\": \"Success\",\n    \"data\": {\n        \"loan_ref_num\": \"LN-01032026-868624193\",\n        \"is_delinquent\": false\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loan_ref_num\": \"LN-02032026-809407916\",\n  \"amount\": 1100000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8082/api/v1/loans/payment",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "v1",
+            "loans",
+            "payment"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Pay Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loan_ref_num\": \"LN-02032026-809407916\",\n  \"amount\": 1100000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/v1/loans/payment",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "v1",
+                "loans",
+                "payment"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 03:54:26 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "236"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": \"00\",\n    \"message\": \"Success\",\n    \"data\": {\n        \"loan_ref_num\": \"LN-02032026-809407916\",\n        \"trx_ref_num\": \"TXN-02032026-187331486\",\n        \"paid_amount\": 1100000,\n        \"paid_installments\": [\n            1\n        ],\n        \"remaining_outstanding\": 2200000,\n        \"paid_at\": \"2026-03-02T10:54:26+07:00\"\n    }\n}"
+        },
+        {
+          "name": "Loan already closed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loan_ref_num\": \"LN-02032026-809407916\",\n  \"amount\": 2200000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/v1/loans/payment",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "v1",
+                "loans",
+                "payment"
+              ]
+            }
+          },
+          "status": "Not Acceptable",
+          "code": 406,
+          "_postman_previewlanguage": null,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 03:57:27 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "60"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"code\": \"04\",\n    \"message\": \"Loan is already closed\",\n    \"data\": null\n}"
+        }
+      ]
+    }
+  ]
+}
