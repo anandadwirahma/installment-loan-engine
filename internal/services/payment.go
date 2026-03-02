@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"time"
 
 	"installment-loan-engine/internal/dto"
@@ -11,7 +12,7 @@ import (
 	"installment-loan-engine/internal/shared/logger"
 )
 
-func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInstallmentResponse, error) {
+func (s *loanService) PayInstallment(ctx context.Context, req dto.PayInstallmentRequest) (dto.PayInstallmentResponse, error) {
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.PayInstallment] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
@@ -22,6 +23,23 @@ func (s *loanService) PayInstallment(req dto.PayInstallmentRequest) (dto.PayInst
 		logger.Errorf("[service.PayInstallment] Loan is closed for RefNum %s", req.LoanRefNum)
 		return dto.PayInstallmentResponse{}, errors.ErrLoanClosed
 	}
+
+	incr, err := s.cacheRepo.IncrPay(ctx, req.LoanRefNum)
+	if err != nil {
+		logger.Errorf("[service.PayInstallment] Error incrementing payment counter for RefNum %s: %v", req.LoanRefNum, err)
+		return dto.PayInstallmentResponse{}, errors.ErrGeneral
+	}
+
+	if incr > int64(1) {
+		logger.Errorf("[service.PayInstallment] Payment already in progress for RefNum %s", req.LoanRefNum)
+		return dto.PayInstallmentResponse{}, errors.ErrPaymentInProgress
+	}
+
+	defer func() {
+		if redisErr := s.cacheRepo.DelPayIncr(ctx, req.LoanRefNum); redisErr != nil {
+			logger.Errorf("[service.PayInstallment] Error deleting redis payment incr for RefNum %s: %v", req.LoanRefNum, redisErr)
+		}
+	}()
 
 	installments, err := s.installmentRepo.GetOutstandingInstallments(loan.ID)
 	if err != nil {

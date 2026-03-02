@@ -46,4 +46,5 @@ var (
 	ErrLoanClosed               = NewError(http.StatusNotAcceptable, "04", "Loan is already closed")
 	ErrNoOutstandingInstallment = NewError(http.StatusNotAcceptable, "05", "No Outstanding Installment")
 	ErrInvalidAmount            = NewError(http.StatusBadRequest, "06", "Invalid Amount")
+	ErrPaymentInProgress        = NewError(http.StatusConflict, "07", "Payment already in progress")
 )

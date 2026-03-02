@@ -6,6 +6,7 @@ type Config struct {
 	InterestType string  `env:"INTEREST_TYPE"`
 	TenorWeeks   int16   `env:"TENOR_WEEKS"`
 	Database     DatabaseConfig
+	Redis        RedisConfig
 }
 
 type DatabaseConfig struct {
@@ -17,4 +18,11 @@ type DatabaseConfig struct {
 	MaxIdleConns           int    `env:"DB_MAX_IDLE_CONNS"`
 	MaxOpenConns           int    `env:"DB_MAX_OPEN_CONNS"`
 	ConnMaxLifetimeMinutes int    `env:"DB_CONN_MAX_LIFETIME_MINUTES"`
+}
+
+type RedisConfig struct {
+	Host     string `env:"REDIS_HOST"`
+	Port     string `env:"REDIS_PORT"`
+	Password string `env:"REDIS_PASSWORD"`
+	DB       int    `env:"REDIS_DB"`
 }

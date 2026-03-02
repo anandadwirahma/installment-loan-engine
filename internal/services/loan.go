@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"time"
 
 	"installment-loan-engine/internal/dto"
@@ -11,7 +12,7 @@ import (
 	"installment-loan-engine/internal/shared/logger"
 )
 
-func (s *loanService) CreateLoan(req dto.CreateLoanRequest) (dto.CreateLoanResponse, error) {
+func (s *loanService) CreateLoan(ctx context.Context, req dto.CreateLoanRequest) (dto.CreateLoanResponse, error) {
 	totalInterest := int64(float64(req.PrincipalAmount) * s.cfg.InterestRate)
 	totalRepayment := req.PrincipalAmount + totalInterest
 

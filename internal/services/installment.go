@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"time"
 
 	"installment-loan-engine/internal/dto"
@@ -9,7 +10,7 @@ import (
 	"installment-loan-engine/internal/shared/logger"
 )
 
-func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInstallmentResponse, error) {
+func (s *loanService) GetInstallment(ctx context.Context, req dto.GetInstallmentRequest) (dto.GetInstallmentResponse, error) {
 	loan, err := s.loanRepo.GetLoanInstallmentByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.GetInstallment] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
@@ -63,7 +64,7 @@ func (s *loanService) GetInstallment(req dto.GetInstallmentRequest) (dto.GetInst
 	return resp, nil
 }
 
-func (s *loanService) GetOutstanding(req dto.GetOutstandingRequest) (dto.GetOutstandingResponse, error) {
+func (s *loanService) GetOutstanding(ctx context.Context, req dto.GetOutstandingRequest) (dto.GetOutstandingResponse, error) {
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.GetOutstanding] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
@@ -78,7 +79,7 @@ func (s *loanService) GetOutstanding(req dto.GetOutstandingRequest) (dto.GetOuts
 	return resp, nil
 }
 
-func (s *loanService) CheckDelinquent(req dto.CheckDelinquentRequest) (dto.CheckDelinquentResponse, error) {
+func (s *loanService) CheckDelinquent(ctx context.Context, req dto.CheckDelinquentRequest) (dto.CheckDelinquentResponse, error) {
 	loan, err := s.loanRepo.GetByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.CheckDelinquent] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)

@@ -11,6 +11,7 @@ import (
 	"installment-loan-engine/internal/shared/config"
 	"installment-loan-engine/internal/shared/database"
 	"installment-loan-engine/internal/shared/logger"
+	"installment-loan-engine/internal/shared/redis"
 )
 
 func main() {
@@ -23,13 +24,17 @@ func main() {
 	// Initiate Database
 	database.Init()
 
+	// Initiate Redis
+	redis.Init()
+
 	// Initiate Repository
 	loanRepo := repositories.NewLoanRepository(database.DB)
 	installmentRepo := repositories.NewInstallmentRepository(database.DB)
 	transactionRepo := repositories.NewTransactionRepository(database.DB)
+	cacheRepo := repositories.NewCacheRepository(redis.RDB)
 
 	// Initiate Service
-	loanService := services.NewLoanService(loanRepo, installmentRepo, transactionRepo, config.AppConfig)
+	loanService := services.NewLoanService(loanRepo, installmentRepo, transactionRepo, cacheRepo, config.AppConfig)
 
 	// Initiate Handler
 	healthCheckHandler := handlers.NewHealthCheckHandler()
