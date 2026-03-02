@@ -9,9 +9,9 @@ Before running the service, ensure you have the following installed:
 - **Go**: Version 1.21 or higher.
 - **Docker**: For containerized execution.
 - **Database**: PostgreSQL (or the DB configured in your `.env`).
+- **Redis**: For caching (or the Redis configured in your `.env`).
 
 ### Running with Bash Script (Recommended)
-This is the easiest way to run the service as it automates database creation and dependency management.
 1. Make sure you have PostgreSQL running and your `.env` file is configured.
 2. Run the script:
    ```bash
@@ -21,30 +21,30 @@ This is the easiest way to run the service as it automates database creation and
 ### Running Manually
 1.  Ensure you have [Go](https://golang.org/doc/install) installed (version 1.21+ recommended).
 2.  Ensure you have [PostgreSQL](https://www.postgresql.org/download/) installed and running.
-3.  **Create the database** if it doesn't already exist:
+3.  Ensure you have [Redis](https://redis.io/download/) installed and running.
+4.  **Create the database** if it doesn't already exist:
     ```bash
     psql -h localhost -U postgres -c "CREATE DATABASE billenginedb"
     ```
-4.  Clone the repository and navigate to the project root.
-5.  Install dependencies:
+5.  Clone the repository and navigate to the project root.
+6.  Install dependencies:
     ```bash
     go mod tidy
     ```
-6.  Setup your environment variables in a `.env` file.
-7.  Run the application:
+7.  Setup your environment variables in a `.env` file.
+8.  Run the application:
     ```bash
     go run main.go
     ```
 
 ### Running with Docker Compose
 1. Ensure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
-2. Setup your environment variables in the `.env` file (see [Docker Compose Variables](#docker-compose-variables) section if needed).
-3. Build and start the containers:
+2. Build and start the containers:
     ```bash
     docker-compose up -d --build
     ```
-4. The service will be available at `http://localhost:8082`.
-5. To stop the containers:
+3. The service will be available at `http://localhost:8082`.
+4. To stop the containers:
     ```bash
     docker-compose down
     ```
@@ -72,6 +72,8 @@ exact amount of payable that week or not pay at all
 - **Maintainability**:
     - Built using Clean Architecture for clear separation of concerns.
 - **Reliability**
+    - Handles race conditions in payment transactions.
+    - Ensures idempotent payment processing to prevent duplicate transactions.
 - **Observability**
     - Implements structured logging for tracking service operations.
 
