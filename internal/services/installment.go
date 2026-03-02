@@ -14,7 +14,7 @@ func (s *loanService) GetInstallment(ctx context.Context, req dto.GetInstallment
 	loan, err := s.loanRepo.GetLoanInstallmentByRefNum(req.LoanRefNum)
 	if err != nil {
 		logger.Errorf("[service.GetInstallment] Error fetching loan for RefNum %s: %v", req.LoanRefNum, err)
-		return dto.GetInstallmentResponse{}, errors.ErrGeneral
+		return dto.GetInstallmentResponse{}, errors.ErrNotFound
 	}
 
 	var (

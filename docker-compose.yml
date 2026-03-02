@@ -1,8 +1,8 @@
 services:
   # PostgreSQL Service
-  postgres-db:
-    image: postgres:latest
-    container_name: postgres-db
+  postgres-db-billengine:
+    image: postgres:15
+    container_name: postgres-db-billengine
     restart: on-failure
     env_file:
       - .env
@@ -10,38 +10,74 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "${HOST_DB_PORT}:${CONT_DB_PORT}"
     volumes:
-      - postgres-db-data:/var/lib/postgresql/data
+      - postgres-db-billengine-data:/var/lib/postgresql/data
     networks:
-      - loan-engine-network
+      - installment-loan-engine-network
+
+  # Redis Service
+  redis-billengine:
+    image: redis:7-alpine
+    container_name: redis-billengine
+    restart: on-failure
+    env_file:
+      - .env
+    command: >
+      redis-server
+      --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "${HOST_REDIS_PORT}:${CONT_REDIS_PORT}"
+    volumes:
+      - redis-billengine-data:/data
+    networks:
+      - installment-loan-engine-network
 
   # API Installment Loan Engine Service
-  api-installment-loan-engine:
+  installment-loan-engine:
     build: .
     image: installment-loan-engine:1.0.0
-    container_name: api-installment-loan-engine
+    container_name: installment-loan-engine
     restart: on-failure
     depends_on:
-      - postgres-db
+      postgres-db-billengine:
+        condition: service_healthy
+      redis-billengine:
+        condition: service_healthy
     env_file:
       - .env
     ports:
       - "${HOST_API_PORT}:${CONT_API_PORT}"
     environment:
       - APP_PORT=${CONT_API_PORT}
-      - DB_HOST=postgres-db
+      - DB_HOST=postgres-db-billengine
       - DB_PORT=${CONT_DB_PORT}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
+      - REDIS_HOST=redis-billengine
+      - REDIS_PORT=${CONT_REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_DB=${REDIS_DB}
     networks:
-      - loan-engine-network
+      - installment-loan-engine-network
 
 volumes:
-  postgres-db-data:
+  postgres-db-billengine-data:
+  redis-billengine-data:
 
 networks:
-  loan-engine-network:
+  installment-loan-engine-network:
+    name: installment-loan-engine-network
     driver: bridge

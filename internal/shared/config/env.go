@@ -13,14 +13,12 @@ import (
 var AppConfig Config
 
 func Init() {
-	err := godotenv.Load()
-	if err != nil {
-		panic(fmt.Errorf("Error loading .env file: %v", err))
+	if err := godotenv.Load(); err != nil {
+		logger.Infof("No .env file found, using system environment")
 	}
 
-	err = env.Parse(&AppConfig)
-	if err != nil {
-		panic(fmt.Errorf("Error parsing env: %v", err))
+	if err := env.Parse(&AppConfig); err != nil {
+		panic(fmt.Errorf("error parsing env: %v", err))
 	}
 
 	logger.Infof("Config loaded: %+v\n", AppConfig)

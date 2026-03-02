@@ -22,6 +22,8 @@ RUN go build -o installment-loan-engine .
 # Stage 2: Create the production image
 FROM alpine:latest
 
+RUN apk add --no-cache tzdata
+
 # Set working directory
 WORKDIR /app
 
