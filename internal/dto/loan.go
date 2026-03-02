@@ -1,8 +1,8 @@
 package dto
 
 type CreateLoanRequest struct {
-	BorrowerRefNum  string `json:"borrower_ref_num"`
-	PrincipalAmount int64  `json:"principal_amount"`
+	BorrowerRefNum  string `json:"borrower_ref_num" binding:"required"`
+	PrincipalAmount int64  `json:"principal_amount" binding:"required"`
 }
 
 type CreateLoanResponse struct {

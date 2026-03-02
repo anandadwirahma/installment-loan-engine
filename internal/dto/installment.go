@@ -45,8 +45,8 @@ type CheckDelinquentResponse struct {
 }
 
 type PayInstallmentRequest struct {
-	LoanRefNum string `json:"loan_ref_num"`
-	Amount     int64  `json:"amount"`
+	LoanRefNum string `json:"loan_ref_num" binding:"required"`
+	Amount     int64  `json:"amount" binding:"required"`
 }
 
 type PayInstallmentResponse struct {
