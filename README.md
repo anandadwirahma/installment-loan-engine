@@ -104,6 +104,9 @@ The service follows **Clean Architecture** patterns:
 #### High Level Architecture
 ![High Level Architecture](assets/high-level-architecture.png)
 
+#### Bill Engine Service Architecture
+![Bill Engine Service Architecture](assets/service-architecture.png)
+
 URL: [\[High Level Flow & Architecture\]](https://whimsical.com/flow-SjJbuFRC3k4W65SLDZVHJ2)
 
 ### 3. Database Design
