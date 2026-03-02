@@ -58,7 +58,7 @@ Before running the service, ensure you have the following installed:
 - **Loan Schedule Generation**:
     - generates a weekly installment schedule upon loan creation.
 - **Outstanding Calculation**:
-    - calculates ofoutstanding on a loan and due date.
+    - calculates of outstanding on a loan and due date.
 - **Delinquent Detection**:
     - detects borrowers with more than 2 weeks of Non payment of the loan amount.
 - **Create Payment**:
